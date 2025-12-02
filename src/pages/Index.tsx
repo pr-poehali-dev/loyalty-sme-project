@@ -171,28 +171,28 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-border bg-white/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
               <div className="text-2xl font-bold text-accent">A</div>
-              <nav className="hidden md:flex items-center gap-6 text-sm">
+              <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                 <a href="#" className="hover:text-primary transition-colors">Частным лицам</a>
                 <a href="#" className="hover:text-primary transition-colors">Малому бизнесу и ИП</a>
                 <a href="#" className="hover:text-primary transition-colors">Среднему и крупному бизнесу</a>
               </nav>
             </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" className="hover:bg-muted">
                 <Icon name="Search" size={20} />
               </Button>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hover:bg-muted">
                 <Icon name="Heart" size={20} />
               </Button>
-              <Button variant="ghost" className="hidden md:inline-flex">
+              <Button variant="ghost" className="hidden md:inline-flex hover:bg-muted">
                 Онлайн-заявка
               </Button>
-              <Button className="bg-accent hover:bg-accent/90">Войти</Button>
+              <Button className="bg-accent hover:bg-accent/90 text-white rounded-full">Войти</Button>
             </div>
           </div>
         </div>
@@ -279,30 +279,52 @@ const Index = () => {
                     </Button>
                   </div>
 
-                  <div className="relative">
-                    <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                  <div className="relative group">
+                    <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide scroll-smooth">
                       {industry.programs.map((program, idx) => (
-                        <Card key={idx} className="min-w-[300px] md:min-w-[350px] snap-start p-6 bg-card border border-border rounded-2xl hover:shadow-lg transition-all cursor-pointer flex-shrink-0">
+                        <Card key={idx} className="min-w-[300px] md:min-w-[350px] snap-start p-6 bg-card border border-border rounded-2xl hover:shadow-xl hover:border-primary/30 transition-all duration-300 cursor-pointer flex-shrink-0 animate-fade-in" style={{ animationDelay: `${idx * 100}ms` }}>
                           <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 flex items-center justify-center text-3xl bg-muted/50 rounded-xl">
+                            <div className="w-14 h-14 flex items-center justify-center text-3xl bg-muted rounded-xl">
                               {program.logo}
                             </div>
-                            <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                            <Icon name="ArrowRight" size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
                           
                           <h4 className="text-xl font-bold mb-2">{program.name}</h4>
                           <p className="text-sm text-muted-foreground mb-4 min-h-[40px]">{program.description}</p>
                           
-                          <div className="mb-4">
-                            <p className="text-sm font-medium text-primary">{program.benefit}</p>
+                          <div className="mb-4 pb-4 border-b border-border">
+                            <p className="text-xs text-muted-foreground mb-1">Кэшбэк</p>
+                            <p className="text-lg font-bold text-foreground">{program.benefit}</p>
                           </div>
                           
-                          <Button variant="link" className="text-primary p-0 h-auto font-medium">
+                          <Button variant="link" className="text-primary p-0 h-auto font-medium hover:gap-2 transition-all flex items-center gap-1">
                             {program.action}
+                            <Icon name="ArrowRight" size={16} />
                           </Button>
                         </Card>
                       ))}
                     </div>
+                    
+                    <button 
+                      className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
+                      onClick={(e) => {
+                        const container = e.currentTarget.parentElement?.querySelector('.overflow-x-auto');
+                        if (container) container.scrollBy({ left: -350, behavior: 'smooth' });
+                      }}
+                    >
+                      <Icon name="ChevronLeft" size={20} />
+                    </button>
+                    
+                    <button 
+                      className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
+                      onClick={(e) => {
+                        const container = e.currentTarget.parentElement?.querySelector('.overflow-x-auto');
+                        if (container) container.scrollBy({ left: 350, behavior: 'smooth' });
+                      }}
+                    >
+                      <Icon name="ChevronRight" size={20} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -320,6 +342,100 @@ const Index = () => {
                 </Button>
               </div>
             )}
+          </div>
+        </section>
+
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Как начать получать выгоду</h2>
+                <div className="flex justify-center gap-4 mb-8">
+                  <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-6">
+                    Не клиент Альфа-Бизнес
+                  </Button>
+                  <Button variant="outline" className="rounded-full px-6">
+                    Клиент Альфа-Бизнес
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8 mb-12">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent font-bold text-xl mx-auto mb-4">
+                    1
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Заявка</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Заполните заявку и откройте бесплатный счёт для бизнеса
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent font-bold text-xl mx-auto mb-4">
+                    2
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Войдите в интернет-банк Альфа-Бизнес</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Авторизуйтесь под своими учётными данными
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-accent font-bold text-xl mx-auto mb-4">
+                    3
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Готово</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Перейдите в раздел Альфа-Выгодно для бизнеса и начинайте получать выгоду
+                  </p>
+                </div>
+              </div>
+
+              <Card className="p-8 md:p-12 bg-card rounded-3xl shadow-lg max-w-2xl mx-auto">
+                <h3 className="text-2xl font-bold text-center mb-6">
+                  Заявка на открытие счёта<br />для бизнеса
+                </h3>
+
+                <form className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">Мобильный телефон</label>
+                    <Input 
+                      type="tel" 
+                      placeholder="+7 ("
+                      className="h-12 rounded-xl bg-muted/50 border-0"
+                    />
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="flex-1 h-12 rounded-xl"
+                    >
+                      Перезвонить мне
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="flex-1 h-12 rounded-xl bg-accent hover:bg-accent/90"
+                    >
+                      Отправить заявку
+                    </Button>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-xl">
+                    <Icon name="Shield" size={20} className="text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      Мы гарантируем безопасность и сохранность ваших данных
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground text-center">
+                    Нажимая кнопку «Отправить заявку» или «Перезвонить мне», вы подтверждаете, что согласны на обработку персональных данных
+                  </p>
+                </form>
+              </Card>
+            </div>
           </div>
         </section>
       </main>
