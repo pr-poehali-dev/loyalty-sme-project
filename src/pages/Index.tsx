@@ -1,43 +1,173 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState('bank');
-
-  const partners = [
-    { name: 'Яндекс Директ', description: 'Мастер рекламных кампаний', cashback: '50%', type: 'Кэшбек', icon: '🎯' },
-    { name: 'Яндекс Бизнес', description: 'Реклама вашей компании, которая приводит клиентов', cashback: '50%', type: 'Кэшбек', icon: '📊' },
-    { name: 'Островок!', description: 'Сервис бронирования отелей и квартир', cashback: '5%', type: 'Кэшбек', icon: '🏝️' },
-    { name: 'Яндекс 360 для бизнеса', description: 'Облачные офис для вашей компании', cashback: '20% и 30%', type: 'Кэшбэк и скидка', icon: '🔵' },
-    { name: 'Айтиком', description: 'Электронная подпись для любых целей бизнеса', cashback: '15%', type: 'Скидка', icon: '🔐' },
-    { name: 'МойСклад', description: 'Программа для торговли на маркетплейсах', cashback: '3 месяца', type: 'Бесплатно', icon: '📦' },
-  ];
-
-  const benefits = [
-    { title: 'Предложения от банка', icon: '🎯', color: 'bg-gradient-to-br from-orange-500 to-orange-600' },
-    { title: 'Предложения от партнёров', icon: '💳', color: 'bg-gradient-to-br from-cyan-500 to-cyan-600' },
-    { title: 'Реальные деньги', icon: '💰', color: 'bg-gradient-to-br from-green-500 to-green-600' },
-    { title: 'Помощь другим', icon: '🤝', color: 'bg-gradient-to-br from-red-500 to-red-600' },
-  ];
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [visibleIndustries, setVisibleIndustries] = useState(10);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const hasShownPopup = useRef(false);
 
   const industries = [
-    { title: 'Для онлайн-торговли', description: 'Помощь в продаже товаров и услуг на сайте, маркетплейсах и в соцсетях', icon: '🛍️', color: 'bg-gradient-to-br from-lime-400 to-lime-500' },
-    { title: 'Для розничной торговли', description: 'Помощь снизить расходы на бизнес и банковское обслуживание', icon: '🛒', color: 'bg-gradient-to-br from-green-400 to-green-500' },
-    { title: 'Для бизнеса на маркетплейсах', description: 'Помощь выйти на площадки и стать топ-продавцом', icon: '🏪', color: 'bg-gradient-to-br from-lime-300 to-lime-400' },
-    { title: 'Для бьюти-бизнеса и фитнес-клубов', description: 'Автоматизируйте бизнес и снизите расходы на обслуживание', icon: '💅', color: 'bg-gradient-to-br from-pink-400 to-pink-500' },
-    { title: 'Для франшизного бизнеса', description: 'Поддержка на старте и помощь масштабировать сеть', icon: '🏢', color: 'bg-gradient-to-br from-red-400 to-red-500' },
-    { title: 'Для небольших кафе и фастфуда', description: 'Помощь оптимизировать работу заведения и усилить развитие', icon: '🍔', color: 'bg-gradient-to-br from-blue-400 to-blue-500' },
+    {
+      id: 1,
+      title: 'Старт бизнеса',
+      description: 'Все для старта бизнеса',
+      programs: [
+        { name: 'Авито', logo: '🏢', description: 'Онлайн-сервис для размещения объявлений', benefit: '100% кэшбэк бонусами за продвижение в категории «услуги»', action: 'Активировать' },
+        { name: 'Контур.Эльба', logo: '📊', description: 'Онлайн-бухгалтерия для ИП и ООО', benefit: 'До 1 года бесплатно', action: 'Активировать' },
+        { name: 'Яндекс Бизнес', logo: '🎯', description: 'Реклама подписки для ИП/ООО-бизнеса', benefit: '10 000 ₽ на запуск рекламы и сопровождение специалистом', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 2,
+      title: 'Работа в онлайне',
+      description: 'Сервисы для перевода бизнеса в интернет и работы в онлайне',
+      programs: [
+        { name: 'CloudKassir', logo: '💳', description: 'Онлайн-касса для интернет-магазина', benefit: 'Скидка 15 000 ₽ на первый год обслуживания', action: 'Активировать' },
+        { name: 'Яндекс Директ', logo: '🎯', description: 'Реклама в Поиске, Картах и Рекламной сети', benefit: 'Промокод на 10 000 ₽ для нового рекламного запуска рекламы', action: 'Активировать' },
+        { name: 'Контур.Эльба', logo: '📊', description: 'Онлайн-бухгалтерия для ИП и ООО', benefit: 'До 1 года бесплатно', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 3,
+      title: 'Всё для ВЭД',
+      description: 'Сервисы для работы с экспортом/импортом, таможенным оформлением, ВЭД-контрактами и ведение расчётов',
+      programs: [
+        { name: 'Weconn', logo: '🌐', description: 'Услуги для импорта и экспорта', benefit: 'Бесплатная Консультация по импорту', action: 'Активировать' },
+        { name: 'Сервис GtPaid', logo: '💰', description: 'Приём платежей через сервис «GtPaid»', benefit: 'Приём платежей через сервис', action: 'Активировать' },
+        { name: 'Sinotrans', logo: '🚢', description: 'Отгрузка и доставка бизнес-грузов', benefit: 'Скидка 15% на услуги', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 4,
+      title: 'Розничный бизнес',
+      description: 'Сервисы для старта и развития кафе и ресторанов, франшиз/действующих магазинов, салонов, маркет',
+      programs: [
+        { name: 'Т-Бизнес', logo: '📱', description: 'Раздевание бизнеса', benefit: 'Кэшбэк 100% за первый запуск рекламы', action: 'Активировать' },
+        { name: 'Контур.Эльба', logo: '📊', description: 'Онлайн-бухгалтерия для ИП и ООО', benefit: 'До 1 года бесплатно', action: 'Активировать' },
+        { name: 'HeadHunter', logo: '👔', description: 'Площадка для поиска сотрудников', benefit: '30 дней бесплатного размещения вакансии', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 5,
+      title: 'Маркетплейсы',
+      description: 'Сервисы для продавцов на маркетплейсах',
+      programs: [
+        { name: 'Wildberries', logo: '🛍️', description: 'Продажа на маркетплейсе', benefit: 'Кэшбэк до 5% с оборота', action: 'Активировать' },
+        { name: 'OZON', logo: '📦', description: 'Маркетплейс для продавцов', benefit: '3 месяца бесплатного размещения', action: 'Активировать' },
+        { name: 'Яндекс Маркет', logo: '🛒', description: 'Продажи через Яндекс', benefit: 'Кэшбэк 10% за первый месяц', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 6,
+      title: 'Бухгалтерия и учет',
+      description: 'Программы для ведения бухгалтерии, отчётности и документооборота',
+      programs: [
+        { name: 'Контур.Эльба', logo: '📊', description: 'Онлайн-бухгалтерия для ИП и ООО', benefit: 'До 1 года бесплатно', action: 'Активировать' },
+        { name: '1С-Отчетность', logo: '📄', description: 'Электронная отчётность', benefit: 'Скидка 20% на год', action: 'Активировать' },
+        { name: 'МойСклад', logo: '📦', description: 'Учёт товаров и продаж', benefit: '3 месяца бесплатно', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 7,
+      title: 'Реклама и маркетинг',
+      description: 'Сервисы для продвижения бизнеса, рекламы и привлечения клиентов',
+      programs: [
+        { name: 'Яндекс Директ', logo: '🎯', description: 'Контекстная реклама', benefit: 'Промокод 10 000 ₽', action: 'Активировать' },
+        { name: 'VK Реклама', logo: '📱', description: 'Реклама в соцсетях', benefit: 'Кэшбэк 20% за первую кампанию', action: 'Активировать' },
+        { name: 'Авито Реклама', logo: '🏢', description: 'Продвижение объявлений', benefit: '100% кэшбэк бонусами', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 8,
+      title: 'HR и подбор персонала',
+      description: 'Сервисы для поиска сотрудников и управления персоналом',
+      programs: [
+        { name: 'HeadHunter', logo: '👔', description: 'Поиск сотрудников', benefit: '30 дней бесплатно', action: 'Активировать' },
+        { name: 'Работа.ру', logo: '💼', description: 'База резюме', benefit: 'Скидка 25% на пакет', action: 'Активировать' },
+        { name: 'Superjob', logo: '🎓', description: 'Подбор персонала', benefit: '2 месяца бесплатно', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 9,
+      title: 'Логистика и доставка',
+      description: 'Сервисы для организации доставки товаров и логистики',
+      programs: [
+        { name: 'СДЭК', logo: '📮', description: 'Доставка по России', benefit: 'Кэшбэк 5% с отправлений', action: 'Активировать' },
+        { name: 'Boxberry', logo: '📦', description: 'Курьерская доставка', benefit: 'Скидка 15% на первый месяц', action: 'Активировать' },
+        { name: 'DPD', logo: '🚚', description: 'Международная доставка', benefit: 'Кэшбэк 3%', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 10,
+      title: 'IT и безопасность',
+      description: 'Сервисы для IT-инфраструктуры, кибербезопасности и автоматизации',
+      programs: [
+        { name: 'Kaspersky', logo: '🔐', description: 'Антивирусная защита бизнеса', benefit: 'Скидка 30% на лицензии', action: 'Активировать' },
+        { name: 'Битрикс24', logo: '💻', description: 'CRM и автоматизация', benefit: '6 месяцев бесплатно', action: 'Активировать' },
+        { name: 'Яндекс 360', logo: '☁️', description: 'Облачный офис', benefit: 'Кэшбэк 20% и скидка 30%', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 11,
+      title: 'Образование и развитие',
+      description: 'Курсы, тренинги и платформы для обучения сотрудников',
+      programs: [
+        { name: 'Skillbox', logo: '🎓', description: 'Онлайн-курсы для бизнеса', benefit: 'Скидка 40% на корпоративное обучение', action: 'Активировать' },
+        { name: 'Нетология', logo: '📚', description: 'Обучение digital-профессиям', benefit: 'Кэшбэк 15%', action: 'Активировать' },
+        { name: 'GeekBrains', logo: '💡', description: 'IT-образование', benefit: '3 месяца бесплатно', action: 'Активировать' },
+      ]
+    },
+    {
+      id: 12,
+      title: 'Финансы и страхование',
+      description: 'Финансовые сервисы, страхование и инвестиции',
+      programs: [
+        { name: 'Тинькофф Страхование', logo: '🛡️', description: 'Страхование бизнеса', benefit: 'Скидка 20% на полисы', action: 'Активировать' },
+        { name: 'Сбер Факторинг', logo: '💰', description: 'Финансирование для бизнеса', benefit: 'Льготная ставка 8%', action: 'Активировать' },
+        { name: 'Альфа-Лизинг', logo: '🚗', description: 'Лизинг оборудования', benefit: 'Без первого взноса', action: 'Активировать' },
+      ]
+    },
   ];
 
-  const faqItems = [
-    { question: 'Где можно ознакомиться с правилами программы Альфа-Выгодно для бизнеса?', answer: 'С правилами программы вы можете ознакомиться на официальном сайте Альфа-Банка в разделе "Документы" или запросить у менеджера при оформлении счёта.' },
-    { question: 'Как стать участником программы лояльности Альфа-Выгодно для бизнеса?', answer: 'Для участия в программе достаточно открыть счёт для бизнеса в Альфа-Банке. После открытия счёта вы автоматически станете участником программы лояльности.' },
-    { question: 'Куда приходит кэшбэк?', answer: 'Кэшбэк начисляется в виде баллов на ваш счёт в программе лояльности. Один балл равен одному рублю. Баллами можно оплачивать покупки у партнёров или обменивать на реальные деньги.' },
-    { question: 'Какие счета участвуют в программе лояльности?', answer: 'В программе участвуют все расчётные счета для бизнеса, открытые в Альфа-Банке: для ИП, ООО и других форм организации бизнеса.' },
-  ];
+  useEffect(() => {
+    const handleScroll = () => {
+      if (hasShownPopup.current) return;
+      
+      const scrolled = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight;
+      
+      if (scrolled > (fullHeight - windowHeight) * 0.66) {
+        setShowLeadForm(true);
+        hasShownPopup.current = true;
+      }
+    };
+
+    const timer = setTimeout(() => {
+      if (!hasShownPopup.current) {
+        setShowLeadForm(true);
+        hasShownPopup.current = true;
+      }
+    }, 20000);
+
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const handleSubmitLead = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowLeadForm(false);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -130,134 +260,66 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="py-16 bg-muted/30">
+        <section className="py-16" ref={mainRef}>
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Получайте баллы<br />
-                и тратьте их как захотите
-              </h2>
-              <div className="flex gap-2">
-                <Button 
-                  variant={activeTab === 'bank' ? 'default' : 'outline'}
-                  className="rounded-full"
-                  onClick={() => setActiveTab('bank')}
-                >
-                  На что копить
-                </Button>
-                <Button 
-                  variant={activeTab === 'earn' ? 'default' : 'outline'}
-                  className="rounded-full"
-                  onClick={() => setActiveTab('earn')}
-                >
-                  Как получить
-                </Button>
-              </div>
-            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">Отраслевые решения</h2>
+            <p className="text-muted-foreground mb-12">Программы лояльности для вашего бизнеса</p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {benefits.map((benefit, index) => (
-                <Card key={index} className={`${benefit.color} border-0 rounded-3xl p-8 text-white hover:scale-105 transition-transform cursor-pointer`}>
-                  <div className="text-6xl mb-4">{benefit.icon}</div>
-                  <h3 className="text-xl font-bold">{benefit.title}</h3>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold">Предложения от партнёров</h2>
-              <Button variant="outline" className="rounded-full">
-                Все предложения
-              </Button>
-            </div>
-
-            <div className="mb-6">
-              <div className="flex items-center gap-4 mb-6">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Icon name="Search" size={20} />
-                </Button>
-                <input 
-                  type="text" 
-                  placeholder="Найти предложение"
-                  className="flex-1 bg-muted border-0 rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <Button variant="outline" className="rounded-full">
-                  Типы предложений
-                  <Icon name="ChevronDown" size={16} className="ml-2" />
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-primary rounded-sm"></div>
-                  <span>Все предложения</span>
-                </div>
-                <Button variant="ghost" size="sm" className="text-primary">Популярное</Button>
-                <Button variant="ghost" size="sm">По категориям</Button>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {partners.map((partner, index) => (
-                <Card key={index} className="p-6 bg-card hover:bg-muted/50 transition-all rounded-2xl border border-border hover:border-primary/50 cursor-pointer group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="text-4xl">{partner.icon}</div>
-                    <Icon name="ChevronRight" className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{partner.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{partner.description}</p>
-                  <div className="flex items-end justify-between">
+            <div className="space-y-16">
+              {industries.slice(0, visibleIndustries).map((industry) => (
+                <div key={industry.id} className="space-y-6">
+                  <div className="flex items-baseline justify-between">
                     <div>
-                      <div className="text-xs text-muted-foreground">{partner.type}</div>
-                      <div className="text-2xl font-bold text-primary">{partner.cashback}</div>
+                      <h3 className="text-2xl font-bold mb-1">{industry.title}</h3>
+                      <p className="text-sm text-muted-foreground">{industry.description}</p>
+                    </div>
+                    <Button variant="link" className="text-primary hidden md:flex items-center gap-1">
+                      Все предложения
+                      <Icon name="ArrowRight" size={16} />
+                    </Button>
+                  </div>
+
+                  <div className="relative">
+                    <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                      {industry.programs.map((program, idx) => (
+                        <Card key={idx} className="min-w-[300px] md:min-w-[350px] snap-start p-6 bg-card border border-border rounded-2xl hover:shadow-lg transition-all cursor-pointer flex-shrink-0">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="w-12 h-12 flex items-center justify-center text-3xl bg-muted/50 rounded-xl">
+                              {program.logo}
+                            </div>
+                            <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
+                          </div>
+                          
+                          <h4 className="text-xl font-bold mb-2">{program.name}</h4>
+                          <p className="text-sm text-muted-foreground mb-4 min-h-[40px]">{program.description}</p>
+                          
+                          <div className="mb-4">
+                            <p className="text-sm font-medium text-primary">{program.benefit}</p>
+                          </div>
+                          
+                          <Button variant="link" className="text-primary p-0 h-auto font-medium">
+                            {program.action}
+                          </Button>
+                        </Card>
+                      ))}
                     </div>
                   </div>
-                </Card>
+                </div>
               ))}
             </div>
-          </div>
-        </section>
 
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">Отраслевые решения</h2>
-            <p className="text-muted-foreground mb-8">Понятный комплекс продуктов и сервисов для развития вашего бизнеса</p>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {industries.map((industry, index) => (
-                <Card key={index} className={`${industry.color} border-0 rounded-2xl p-6 text-gray-900 hover:scale-105 transition-transform cursor-pointer`}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="text-4xl">{industry.icon}</div>
-                    <Icon name="ChevronRight" className="text-gray-700" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">{industry.title}</h3>
-                  <p className="text-sm">{industry.description}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8">Частые вопросы</h2>
-
-            <Accordion type="single" collapsible className="space-y-4">
-              {faqItems.map((item, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="bg-card border border-border rounded-2xl px-6">
-                  <AccordionTrigger className="text-left font-medium hover:no-underline py-6">
-                    {item.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-6">
-                    {item.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            {visibleIndustries < industries.length && (
+              <div className="flex justify-center mt-12">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="rounded-full"
+                  onClick={() => setVisibleIndustries(prev => Math.min(prev + 5, industries.length))}
+                >
+                  Показать ещё отрасли
+                </Button>
+              </div>
+            )}
           </div>
         </section>
       </main>
@@ -303,6 +365,61 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showLeadForm} onOpenChange={setShowLeadForm}>
+        <DialogContent className="sm:max-w-[500px] rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-2">
+              Не нашли подходящую программу?
+            </DialogTitle>
+            <p className="text-center text-muted-foreground">
+              Оставьте заявку, и мы поможем подобрать лучшее предложение для вашего бизнеса
+            </p>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmitLead} className="space-y-6 mt-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Мобильный телефон</label>
+              <Input 
+                type="tel" 
+                placeholder="+7 ("
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="h-12 rounded-xl"
+                required
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="flex-1 h-12 rounded-xl"
+                onClick={() => setShowLeadForm(false)}
+              >
+                Перезвонить мне
+              </Button>
+              <Button 
+                type="submit" 
+                className="flex-1 h-12 rounded-xl bg-accent hover:bg-accent/90"
+              >
+                Отправить заявку
+              </Button>
+            </div>
+
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
+              <Icon name="Shield" size={16} className="mt-0.5 flex-shrink-0" />
+              <p>
+                Мы гарантируем безопасность и сохранность ваших данных
+              </p>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Нажимая кнопку «Отправить заявку» или «Перезвонить мне», вы подтверждаете, что согласны на обработку персональных данных
+            </p>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
